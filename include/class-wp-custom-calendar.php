@@ -230,19 +230,40 @@ class WP_Custom_Calendar
     }
 
     private function get_days_with_posts() {
+        global $wpdb;
         $daywithpost = array();
 
         if( ! $this->is_empty() ) {
             // Get days with posts
-            $dayswithposts = $wpdb->get_results("SELECT DISTINCT DAYOFMONTH(post_date)
-                FROM $wpdb->posts
-                WHERE post_date >= '{$this->args['yeardate']}-{$this->args['monthdate']}-01 00:00:00' {$this->where_string}
-                AND post_date <= '{$this->args['yeardate']}-{$this->args['monthdate']}-{$this->last_day} 23:59:59'", ARRAY_N);
-            if ( $dayswithposts ) {
-                foreach ( (array) $dayswithposts as $daywith ) {
-                    $daywithpost[] = $daywith[0];
-                }
+            $dayswithposts = $wpdb->get_results("SELECT DISTINCT post_id
+                FROM $wpdb->postmeta
+                WHERE
+                ( meta_key = 'post_date_from' AND   meta_value >= '{$this->args['yeardate']}-{$this->args['monthdate']}-01 00:00:00'
+                AND   meta_value <= '{$this->args['yeardate']}-{$this->args['monthdate']}-{$this->last_day} 23:59:59' ) OR
+                ( meta_key = 'post_date_to' AND   meta_value >= '{$this->args['yeardate']}-{$this->args['monthdate']}-01 00:00:00'
+                AND   meta_value <= '{$this->args['yeardate']}-{$this->args['monthdate']}-{$this->last_day} 23:59:59' )
+                ORDER BY meta_value ASC",
+                ARRAY_A);
+
+            $posts = array();
+            foreach ($dayswithposts as $post) {
+                $post_id = $post['post_id'];
+
+                $from = new DateTime( get_post_meta( $post_id, 'post_date_from', true ) );
+                $to = new DateTime( get_post_meta( $post_id, 'post_date_to', true ) );
+
+                $post = new stdClass();
+                $post->ID = $post_id;
+                $post->from = $from->format('d');
+                $post->to = $to->format('d');
+
+                $daywithpost[] = $post;
             }
+            // if ( $dayswithposts ) {
+            //     foreach ( (array) $dayswithposts as $daywith ) {
+            //         $daywithpost[] = $daywith[0];
+            //     }
+            // }
         }
 
         return $daywithpost;
@@ -255,6 +276,7 @@ class WP_Custom_Calendar
         $this->output .= '<tbody><tr>';
 
         $daywithpost = $this->get_days_with_posts();
+        // var_dump($daywithpost);
 
 
         // See how much we should pad in the beginning
@@ -266,6 +288,7 @@ class WP_Custom_Calendar
         $newrow = false;
         $daysinmonth = (int) date( 't', $this->unixmonth );
 
+        // var_dump($daywithpost);
         for ( $day = 1; $day <= $daysinmonth; ++$day ) {
             if ( isset($newrow) && $newrow ) {
                 $this->output .= "\n\t</tr>\n\t<tr>\n\t\t";
@@ -280,16 +303,22 @@ class WP_Custom_Calendar
                 $this->output .= '<td>';
             }
 
-            if ( in_array( $day, $daywithpost ) ) {
+            $c = current($daywithpost);
+            if ( $c && $day >= $c->from && $day <= $c->to ) {
+            // if ( in_array( $day, $daywithpost ) ) {
                 // any posts today?
                 $date_format = date( _x( 'F j, Y', 'daily archives date format' ), strtotime( "{$this->args['yeardate']}-{$this->args['monthdate']}-{$day}" ) );
                 $label = sprintf( __( 'Posts published on %s' ), $date_format );
                 $this->output .= sprintf(
                     '<a href="%s" aria-label="%s">%s</a>',
-                    get_day_link( $this->args['yeardate'], $this->args['monthdate'], $day ),
+                    '#' . $c->ID,//get_day_link( $this->args['yeardate'], $this->args['monthdate'], $day ),
                     esc_attr( $label ),
                     $day
                 );
+
+                if( $day == $c->to ) {
+                    $c = next($daywithpost);
+                }
             } else {
                 $this->output .= $day;
             }

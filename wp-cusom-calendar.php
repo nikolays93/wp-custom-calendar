@@ -21,12 +21,12 @@ function initialize_calendar_plugin() {
 }
 
 add_action( 'get_header', function(){
-    // $calend = new WP_Custom_Calendar('calend');
+    $calend = new WP_Custom_Calendar('calend');
 
-    // $calend->set_caption();
-    // $calend->set_links_body();
-    // $calend->set_week( $initial = true );
-    // $calend->set_month_selector();
+    $calend->set_caption();
+    $calend->set_body();
+    $calend->set_week( $initial = true );
+    $calend->set_month_selector();
 
-    // echo $calend->get_calendar();
+    echo $calend->get_calendar();
 } );
