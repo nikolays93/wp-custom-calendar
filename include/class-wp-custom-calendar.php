@@ -306,4 +306,80 @@ class WP_Custom_Calendar
         }
         $this->output .= "\n\t</tr>\n\t</tbody>\n\t";
     }
+
+    public function set_links_body()
+    {
+        global $wpdb;
+
+        $this->output .= '<tbody><tr>';
+
+        $calend_posts = get_posts( array(
+            'post_type'   => 'post',
+            'post_status' => array('publish', 'future'),
+            'year'        => $this->args['yeardate'],
+            'monthnum'    => $this->args['monthdate'],
+        ) );
+
+        $called = array();
+        foreach ($calend_posts as $post) {
+            $date = new DateTime( $post->post_date );
+            /**
+             * @todo  deep array for multyple
+             */
+            $called[$date->format('d')] = $post;
+        }
+
+        // See how much we should pad in the beginning
+        $pad = calendar_week_mod( date( 'w', $this->unixmonth ) - $this->args['week_begins'] );
+        if ( 0 != $pad ) {
+            $this->output .= "\n\t\t".'<td colspan="'. esc_attr( $pad ) .'" class="pad">&nbsp;</td>';
+        }
+
+        $newrow = false;
+        $daysinmonth = (int) date( 't', $this->unixmonth );
+
+        for ( $day = 1; $day <= $daysinmonth; ++$day ) {
+            if ( isset($newrow) && $newrow ) {
+                $this->output .= "\n\t</tr>\n\t<tr>\n\t\t";
+            }
+            $newrow = false;
+
+            if ( $day == gmdate( 'j', self::$ts ) &&
+                $this->args['monthdate'] == gmdate( 'm', self::$ts ) &&
+                $this->args['yeardate'] == gmdate( 'Y', self::$ts ) ) {
+                $this->output .= '<td id="today">';
+            } else {
+                $this->output .= '<td>';
+            }
+
+            if( isset($called[$day]) ) {
+                $_post = $called[$day];
+                // any posts today?
+                $date_format = date( _x( 'F j, Y', 'daily archives date format' ), strtotime( "{$this->args['yeardate']}-{$this->args['monthdate']}-{$day}" ) );
+                /* translators: Post calendar label. 1: Date */
+                $label = sprintf( __( 'Posts published on %s' ), $date_format );
+                $this->output .= sprintf(
+                    '<a href="%s" aria-label="%s">%s</a>',
+                    get_permalink($_post->ID),
+                //get_day_link( $thisyear, $thismonth, $day ),
+                    $_post->post_title,
+                //esc_attr( $label ),
+                    $day
+                );
+            } else {
+                $this->output .= $day;
+            }
+            $this->output .= '</td>';
+
+            if ( 6 == calendar_week_mod( date( 'w', mktime(0, 0 , 0, $this->args['monthdate'], $day, $this->args['yeardate'] ) ) - $this->args['week_begins'] ) ) {
+                $newrow = true;
+            }
+        }
+
+        $pad = 7 - calendar_week_mod( date( 'w', mktime( 0, 0 , 0, $this->args['monthdate'], $day, $this->args['yeardate'] ) ) - $this->args['week_begins'] );
+        if ( $pad != 0 && $pad != 7 ) {
+            $this->output .= "\n\t\t".'<td class="pad" colspan="'. esc_attr( $pad ) .'">&nbsp;</td>';
+        }
+        $this->output .= "\n\t</tr>\n\t</tbody>\n\t";
+    }
 }
