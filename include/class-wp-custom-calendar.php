@@ -192,16 +192,16 @@ class WP_Custom_Calendar
         $this->output .= '<tfoot><tr>';
 
         // Get the next and previous month and year with at least one post
-        $previous = $wpdb->get_row("SELECT MONTH(post_date) AS month, YEAR(post_date) AS year
-            FROM $wpdb->posts
-            WHERE post_date < '{$this->args['yeardate']}-{$this->args['monthdate']}-01' {$this->where_string}
-            ORDER BY post_date DESC
+        $previous = $wpdb->get_row("SELECT MONTH(meta_value) AS month, YEAR(meta_value) AS year
+            FROM $wpdb->postmeta
+            WHERE meta_value < '{$this->args['yeardate']}-{$this->args['monthdate']}-01' AND meta_key = 'post_date_from'
+            ORDER BY meta_value DESC
             LIMIT 1");
 
-        $next = $wpdb->get_row("SELECT MONTH(post_date) AS month, YEAR(post_date) AS year
-            FROM $wpdb->posts
-            WHERE post_date > '{$this->args['yeardate']}-{$this->args['monthdate']}-{$this->last_day} 23:59:59' {$this->where_string}
-            ORDER BY post_date ASC
+        $next = $wpdb->get_row("SELECT MONTH(meta_value) AS month, YEAR(meta_value) AS year
+            FROM $wpdb->postmeta
+            WHERE meta_value > '{$this->args['yeardate']}-{$this->args['monthdate']}-{$this->last_day} 23:59:59' AND meta_key = 'post_date_to'
+            ORDER BY meta_value ASC
             LIMIT 1");
 
         if ( $previous ) {
@@ -245,7 +245,6 @@ class WP_Custom_Calendar
                 ORDER BY meta_value ASC",
                 ARRAY_A);
 
-            $posts = array();
             foreach ($dayswithposts as $post) {
                 $post_id = $post['post_id'];
 
@@ -254,8 +253,8 @@ class WP_Custom_Calendar
 
                 $post = new stdClass();
                 $post->ID = $post_id;
-                $post->from = $from->format('d');
-                $post->to = $to->format('d');
+                $post->from = $from->format('ymd');
+                $post->to = $to->format('ymd');
 
                 $daywithpost[] = $post;
             }
@@ -289,7 +288,11 @@ class WP_Custom_Calendar
         $daysinmonth = (int) date( 't', $this->unixmonth );
 
         // var_dump($daywithpost);
+        $daytime = new DateTime($this->args['yeardate'] . '-' . $this->args['monthdate'] . '-' . 0);
         for ( $day = 1; $day <= $daysinmonth; ++$day ) {
+            $daytime->modify('+1 day');
+            $dayt = $daytime->format('ymd');
+
             if ( isset($newrow) && $newrow ) {
                 $this->output .= "\n\t</tr>\n\t<tr>\n\t\t";
             }
@@ -304,9 +307,15 @@ class WP_Custom_Calendar
             }
 
             $c = current($daywithpost);
-            if ( $c && $day >= $c->from && $day <= $c->to ) {
-            // if ( in_array( $day, $daywithpost ) ) {
-                // any posts today?
+            $i = 0;
+
+            // var_dump($c->from, $dayt, $c->to);
+            // echo "<hr>";
+            /*if (
+                $c && ($day >= $c->from && $day <= $c->to) // between
+                || $c && ($c->to<=$c->from && $c->to >= $day) // prev
+                || $c && ($c->to<=$c->from && $c->from <= $day)) { */ // next
+            if( $c && $dayt >= $c->from && $dayt <= $c->to ) {
                 $date_format = date( _x( 'F j, Y', 'daily archives date format' ), strtotime( "{$this->args['yeardate']}-{$this->args['monthdate']}-{$day}" ) );
                 $label = sprintf( __( 'Posts published on %s' ), $date_format );
                 $this->output .= sprintf(
@@ -316,7 +325,7 @@ class WP_Custom_Calendar
                     $day
                 );
 
-                if( $day == $c->to ) {
+                if( $dayt == $c->to ) {
                     $c = next($daywithpost);
                 }
             } else {
