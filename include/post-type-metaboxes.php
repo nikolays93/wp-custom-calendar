@@ -54,7 +54,7 @@ function custom_calend_meta_field( $id ) {
 
 add_action( 'add_meta_boxes', 'calendar_meta_box' );
 function calendar_meta_box() {
-    add_meta_box('calend_meta_box', 'Календарь', 'calendar_meta_box_callback', CALEND_POST_TYPE, 'normal', 'high');
+    add_meta_box('calend_meta_box', 'Календарь', 'calendar_meta_box_callback', defined('CALEND_POST_TYPE') ? CALEND_POST_TYPE : 'post', 'normal', 'high');
 }
 
 function calendar_meta_box_callback() {
