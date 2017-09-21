@@ -75,7 +75,7 @@ function calendar_meta_box_callback() {
         <tr>
             <th>Ссылка на событие</th>
             <td>
-                <input type="text" name="calend-link">
+                <input type="text" name="calend-link" value="<?=get_post_meta( $_GET['post'], 'calend_link', true );?>">
             </td>
         </tr>
     </table>

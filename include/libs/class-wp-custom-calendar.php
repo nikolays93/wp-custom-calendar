@@ -318,10 +318,12 @@ class WP_Custom_Calendar
             if( $c && $dayt >= $c->from && $dayt <= $c->to ) {
                 $date_format = date( _x( 'F j, Y', 'daily archives date format' ), strtotime( "{$this->args['yeardate']}-{$this->args['monthdate']}-{$day}" ) );
                 $label = sprintf( __( 'Posts published on %s' ), $date_format );
+                $url = esc_url( get_post_meta( $c->ID, 'calend_link', true ) );
                 $this->output .= sprintf(
                     '<a href="%s" aria-label="%s">%s</a>',
-                    '#' . $c->ID,//get_day_link( $this->args['yeardate'], $this->args['monthdate'], $day ),
-                    esc_attr( $label ),
+                    $url ? $url : '#',
+                    //'#' . $c->ID,//get_day_link( $this->args['yeardate'], $this->args['monthdate'], $day ),
+                    '', //esc_attr( $label ),
                     $day
                 );
 

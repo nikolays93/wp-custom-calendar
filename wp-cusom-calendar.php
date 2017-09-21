@@ -12,6 +12,10 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
+/**
+ * @todo fix prev, next links troubles if event on 2 and more months
+ */
+
 add_action('plugins_loaded', 'initialize_calendar_plugin');
 function initialize_calendar_plugin() {
     require_once __DIR__ . '/include/register-post-type-calendar.php';
@@ -19,13 +23,13 @@ function initialize_calendar_plugin() {
     require_once __DIR__ . '/include/post-type-metaboxes.php';
 }
 
-add_action( 'get_header', function(){
-    $calend = new WP_Custom_Calendar('calend');
+// add_action( 'get_header', function(){
+//     $calend = new WP_Custom_Calendar('calend');
 
-    $calend->set_caption();
-    $calend->set_body();
-    $calend->set_week( $initial = true );
-    $calend->set_month_selector();
+//     $calend->set_caption();
+//     $calend->set_body();
+//     $calend->set_week( $initial = true );
+//     $calend->set_month_selector();
 
-    echo $calend->get_calendar();
-} );
+//     echo $calend->get_calendar();
+// } );
