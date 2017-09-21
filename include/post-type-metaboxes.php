@@ -1,10 +1,10 @@
 <?php
 
-function custom_calend_meta_field( $id ) {
+function custom_calend_meta_field( $id, $post_id ) {
     $day = '';
     $month = '';
     $year = '2017';
-    if( $date = strtotime(get_post_meta( $_GET['post'], 'post_date_' . $id, true )) ) {
+    if( $date = strtotime(get_post_meta( $post_id, 'post_date_' . $id, true )) ) {
         $day = date("d", $date);
         $month = date("m", $date);
         $year = date("Y", $date);
@@ -57,7 +57,7 @@ function calendar_meta_box() {
     add_meta_box('calend_meta_box', 'Календарь', 'calendar_meta_box_callback', defined('CALEND_POST_TYPE') ? CALEND_POST_TYPE : 'post', 'normal', 'high');
 }
 
-function calendar_meta_box_callback() {
+function calendar_meta_box_callback( $post ) {
     ?>
     <style type="text/css">
         #calend-day-from,
@@ -76,19 +76,19 @@ function calendar_meta_box_callback() {
         <tr>
             <th>Дата проведения от</th>
             <td>
-                <?php custom_calend_meta_field('from'); ?>
+                <?php custom_calend_meta_field('from', $post->ID); ?>
             </td>
         </tr>
         <tr>
             <th>Дата проведения до</th>
             <td>
-                <?php custom_calend_meta_field('to'); ?>
+                <?php custom_calend_meta_field('to', $post->ID); ?>
             </td>
         </tr>
         <tr>
             <th>Ссылка на событие</th>
             <td>
-                <input type="text" name="calend-link" value="<?=get_post_meta( $_GET['post'], 'calend_link', true );?>">
+                <input type="text" name="calend-link" value="<?=get_post_meta( $post->ID, 'calend_link', true );?>">
             </td>
         </tr>
     </table>
