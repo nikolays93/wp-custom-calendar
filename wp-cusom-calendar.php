@@ -12,12 +12,11 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
-define('CALEND_POST_TYPE', 'event');
-
 add_action('plugins_loaded', 'initialize_calendar_plugin');
 function initialize_calendar_plugin() {
     require_once __DIR__ . '/include/register-post-type-calendar.php';
-    require_once __DIR__ . '/include/class-wp-custom-calendar.php';
+    require_once __DIR__ . '/include/libs/class-wp-custom-calendar.php';
+    require_once __DIR__ . '/include/libs/class-wp-post-boxes.php';
 }
 
 add_action( 'get_header', function(){
