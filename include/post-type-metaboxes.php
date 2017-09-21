@@ -31,7 +31,7 @@ function custom_calend_meta_field( $id ) {
         <div class="timestamp-wrap">
             <label>
                 <span class="screen-reader-text">День</span>
-                <input type="text" id="calend-day-<?=$id;?>" name="calend-day-<?=$id;?>" value="<?=$day;?>" size="2" maxlength="2" autocomplete="off">
+                <input type="number" id="calend-day-<?=$id;?>" name="calend-day-<?=$id;?>" value="<?=$day;?>" size="2" maxlength="2" autocomplete="off" min="0" max="31">
             </label>
             <label>
                 <span class="screen-reader-text">Месяц</span>
@@ -45,7 +45,7 @@ function custom_calend_meta_field( $id ) {
             </label>
             <label>
                 <span class="screen-reader-text">Год</span>
-                <input type="text" id="calend-year-<?=$id;?>" name="calend-year-<?=$id;?>" value="<?=$year;?>" size="4" maxlength="4" autocomplete="off">
+                <input type="number" id="calend-year-<?=$id;?>" name="calend-year-<?=$id;?>" value="<?=$year;?>" size="4" maxlength="4" autocomplete="off" min="1900" max="9999">
             </label>
         </div>
     </fieldset>
@@ -59,6 +59,19 @@ function calendar_meta_box() {
 
 function calendar_meta_box_callback() {
     ?>
+    <style type="text/css">
+        #calend-day-from,
+        #calend-day-to {
+            width: 45px;
+        }
+        #calend-year-from,
+        #calend-year-to {
+            width: 60px;
+        }
+        #calend-link {
+            width: 100%;
+        }
+    </style>
     <table class="table form-table">
         <tr>
             <th>Дата проведения от</th>
