@@ -1,5 +1,7 @@
 <?php
 
+define('CALEND_POST_TYPE', 'event');
+
 add_action('init', 'register_post_type_calendar');
 function register_post_type_calendar() {
     register_post_type( CALEND_POST_TYPE, array(
