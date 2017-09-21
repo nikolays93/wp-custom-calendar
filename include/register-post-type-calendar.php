@@ -11,7 +11,7 @@ function register_post_type_calendar() {
         'rewrite' => true,
         'public' => true,
         // 'menu_position' => 10,
-        'supports' => array('title', 'custom-fields', 'excerpt'),
+        'supports' => array('title', 'custom-fields'),
         'labels' => array(
           'name' => 'События',
           'singular_name'      => 'Событие',
