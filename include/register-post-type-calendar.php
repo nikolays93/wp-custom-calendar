@@ -1,8 +1,10 @@
 <?php
 
-define('CALEND_POST_TYPE', 'event');
+define('CALEND_POST_TYPE', apply_filters( 'calend_post_type', 'event' ) );
+if( ! in_array(CALEND_POST_TYPE, array('post', 'page')) ) {
+    add_action('init', 'register_post_type_calendar');
+}
 
-add_action('init', 'register_post_type_calendar');
 function register_post_type_calendar() {
     register_post_type( CALEND_POST_TYPE, array(
         'query_var' => true,

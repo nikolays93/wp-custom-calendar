@@ -16,7 +16,7 @@ add_action('plugins_loaded', 'initialize_calendar_plugin');
 function initialize_calendar_plugin() {
     require_once __DIR__ . '/include/register-post-type-calendar.php';
     require_once __DIR__ . '/include/libs/class-wp-custom-calendar.php';
-    require_once __DIR__ . '/include/libs/class-wp-post-boxes.php';
+    require_once __DIR__ . '/include/post-type-metaboxes.php.php';
 }
 
 add_action( 'get_header', function(){
