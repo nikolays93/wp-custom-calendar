@@ -58,7 +58,7 @@ class WP_Custom_Calendar
     public function get_calendar()
     {
         if( $this->output ) {
-            return '<table id="wp-custom-calendar">' . $this->output . '</table>';
+            return '<table id="wp-custom-calendar" class="table">' . $this->output . '</table>';
         }
 
         return '';
