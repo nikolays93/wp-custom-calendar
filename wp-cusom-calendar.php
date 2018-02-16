@@ -12,7 +12,9 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
-define('CALEND_POST_TYPE', 'event');
+function get_calend_post_type() {
+    return apply_filters( 'calend_post_type', 'event' );
+}
 
 add_action('plugins_loaded', 'initialize_calendar_plugin');
 function initialize_calendar_plugin() {

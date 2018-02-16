@@ -2,7 +2,13 @@
 
 add_action('init', 'register_post_type_calendar');
 function register_post_type_calendar() {
-    register_post_type( CALEND_POST_TYPE, array(
+    $post_type = get_calend_post_type();
+    $post_types_registred = get_post_types();
+
+    if( in_array($post_type, $post_types_registred) )
+      return;
+
+    register_post_type( $post_type, array(
         'query_var' => true,
         'rewrite' => true,
         'public' => true,
